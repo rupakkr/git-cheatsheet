@@ -4,295 +4,238 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Git Cheatsheet — rupakkr</title>
-<meta name="description" content="A searchable Git command reference with copy-to-clipboard snippets.">
+<meta name="description" content="A searchable Git command reference with copy-to-clipboard snippets. Covers every command from git-scm.com/docs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0d0d0d;
-    --surface: #161616;
-    --surface2: #1e1e1e;
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.15);
-    --text: #f0ede8;
-    --muted: #6b6b6b;
-    --accent: #c8f542;
-    --accent-dim: rgba(200,245,66,0.1);
-    --accent-text: #0d0d0d;
-    --font-sans: 'Syne', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --radius: 10px;
-    --radius-sm: 6px;
-  }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-
-  /* header */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 28px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--accent);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-icon svg { width: 18px; height: 18px; }
-  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-  .logo-sub { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-top: 1px; }
-  .header-right { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
-  .header-right span { color: var(--accent); }
-
-  /* main layout */
-  main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
-
-  /* search */
-  .search-wrap { position: relative; margin-bottom: 20px; }
-  .search-wrap svg {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; color: var(--muted); pointer-events: none;
-  }
-  #sb {
-    width: 100%;
-    padding: 12px 16px 12px 42px;
-    font-size: 14px;
-    font-family: var(--font-mono);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    transition: border-color 0.15s;
-  }
-  #sb::placeholder { color: var(--muted); }
-  #sb:focus { outline: none; border-color: var(--accent); }
-
-  /* pills */
-  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-  .pill {
-    padding: 5px 12px; font-size: 12px; font-family: var(--font-mono);
-    border: 1px solid var(--border); border-radius: 20px;
-    background: transparent; color: var(--muted); cursor: pointer;
-    transition: all 0.12s;
-  }
-  .pill:hover { border-color: var(--border-hover); color: var(--text); }
-  .pill.on { background: var(--accent-dim); color: var(--accent); border-color: rgba(200,245,66,0.3); }
-
-  /* meta */
-  .meta { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 16px; }
-  .meta span { color: var(--accent); }
-
-  /* cards */
-  .list { display: flex; flex-direction: column; gap: 8px; }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    transition: border-color 0.15s;
-  }
-  .card:hover { border-color: var(--border-hover); }
-
-  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
-  .cmd { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--accent); }
-  .badge {
-    font-size: 10px; font-family: var(--font-mono);
-    padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
-    border: 1px solid;
-  }
-  .b-basic  { color: #7bb8f5; border-color: rgba(123,184,245,0.25); background: rgba(123,184,245,0.08); }
-  .b-branch { color: #b89cf5; border-color: rgba(184,156,245,0.25); background: rgba(184,156,245,0.08); }
-  .b-remote { color: #6dd9b0; border-color: rgba(109,217,176,0.25); background: rgba(109,217,176,0.08); }
-  .b-undo   { color: #f58888; border-color: rgba(245,136,136,0.25); background: rgba(245,136,136,0.08); }
-  .b-inspect{ color: #f5c76d; border-color: rgba(245,199,109,0.25); background: rgba(245,199,109,0.08); }
-  .b-debug  { color: #f59bb8; border-color: rgba(245,155,184,0.25); background: rgba(245,155,184,0.08); }
-  .b-admin  { color: #a0a09a; border-color: rgba(160,160,154,0.25); background: rgba(160,160,154,0.08); }
-
-  .desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
-
-  .code-wrap { position: relative; }
-  pre {
-    font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
-    background: var(--surface2); color: #c9c0b0;
-    padding: 10px 44px 10px 14px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    white-space: pre; overflow-x: auto;
-  }
-  .copy-btn {
-    position: absolute; top: 7px; right: 8px;
-    padding: 3px 9px; font-size: 10px; font-family: var(--font-mono);
-    border: 1px solid var(--border-hover); border-radius: var(--radius-sm);
-    background: var(--surface); color: var(--muted); cursor: pointer;
-    transition: all 0.12s;
-  }
-  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
-  .copy-btn.ok { color: var(--accent); border-color: rgba(200,245,66,0.4); }
-
-  .empty { text-align: center; color: var(--muted); padding: 3rem; font-family: var(--font-mono); font-size: 13px; }
-
-  /* footer */
-  footer {
-    text-align: center; font-size: 12px; color: var(--muted);
-    font-family: var(--font-mono); padding: 24px;
-    border-top: 1px solid var(--border);
-  }
-  footer a { color: var(--accent); text-decoration: none; }
-
-  @media (max-width: 600px) {
-    header { padding: 20px 16px; }
-    main { padding: 24px 16px 48px; }
-    .cmd { font-size: 13px; }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;--surface:#161616;--surface2:#1c1c1c;
+  --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.14);
+  --text:#f0ede8;--muted:#666;--hint:#3a3a3a;
+  --accent:#c8f542;--accent-dim:rgba(200,245,66,0.08);--accent-border:rgba(200,245,66,0.25);
+  --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+  --r:10px;--rs:6px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh}
+header{border-bottom:1px solid var(--border);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px}
+.logo-name{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.hdr-stats{font-size:11px;color:var(--muted);font-family:var(--mono);text-align:right}
+.hdr-stats span{color:var(--accent)}
+main{max-width:980px;margin:0 auto;padding:28px 24px 80px}
+.search-row{position:relative;margin-bottom:16px}
+.search-row svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none}
+#sb{width:100%;padding:11px 14px 11px 40px;font-size:14px;font-family:var(--mono);background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);transition:border-color .15s}
+#sb::placeholder{color:var(--hint)}
+#sb:focus{outline:none;border-color:var(--accent)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.pill{padding:4px 11px;font-size:11px;font-family:var(--mono);border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap}
+.pill:hover{border-color:var(--border-h);color:var(--text)}
+.pill.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border)}
+.meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:11px;color:var(--muted);font-family:var(--mono)}
+.meta span{color:var(--accent)}
+.meta-hint{color:var(--hint);font-size:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:border-color .12s}
+.card:hover{border-color:var(--border-h)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cmd{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);line-height:1.4}
+.badge{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:20px;border:1px solid;white-space:nowrap;flex-shrink:0;line-height:1.6}
+.b-setup{color:#7bb8f5;border-color:rgba(123,184,245,.22);background:rgba(123,184,245,.07)}
+.b-snapshot{color:#a8d8a8;border-color:rgba(168,216,168,.22);background:rgba(168,216,168,.07)}
+.b-branch{color:#b89cf5;border-color:rgba(184,156,245,.22);background:rgba(184,156,245,.07)}
+.b-remote{color:#6dd9b0;border-color:rgba(109,217,176,.22);background:rgba(109,217,176,.07)}
+.b-inspect{color:#f5c76d;border-color:rgba(245,199,109,.22);background:rgba(245,199,109,.07)}
+.b-patch{color:#f0a868;border-color:rgba(240,168,104,.22);background:rgba(240,168,104,.07)}
+.b-debug{color:#f59bb8;border-color:rgba(245,155,184,.22);background:rgba(245,155,184,.07)}
+.b-admin{color:#a0a09a;border-color:rgba(160,160,154,.22);background:rgba(160,160,154,.07)}
+.b-email{color:#88d4f5;border-color:rgba(136,212,245,.22);background:rgba(136,212,245,.07)}
+.b-plumbing{color:#c8a8f0;border-color:rgba(200,168,240,.22);background:rgba(200,168,240,.07)}
+.b-server{color:#f5e87a;border-color:rgba(245,232,122,.22);background:rgba(245,232,122,.07)}
+.desc{font-size:12px;color:var(--muted);line-height:1.5}
+.snippets{display:flex;flex-direction:column;gap:4px}
+.snippet{display:flex;align-items:stretch;border-radius:var(--rs);overflow:hidden;border:1px solid var(--border)}
+.snippet-code{flex:1;font-family:var(--mono);font-size:11.5px;color:#c4bba8;background:var(--surface2);padding:7px 10px;line-height:1.5;word-break:break-all;white-space:pre-wrap}
+.snippet-copy{flex-shrink:0;width:38px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-left:1px solid var(--border);cursor:pointer;color:var(--muted);transition:all .12s}
+.snippet-copy:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.snippet-copy.ok{color:var(--accent)}
+.empty{text-align:center;color:var(--muted);padding:3rem;font-family:var(--mono);font-size:13px;grid-column:1/-1}
+footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;font-size:11px;color:var(--muted);font-family:var(--mono)}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:600px){header{padding:16px}main{padding:20px 14px 60px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">
     <div class="logo-icon">
-      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="4" cy="4" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
-        <circle cx="14" cy="4" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
-        <circle cx="4" cy="14" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
-        <path d="M4 6.5v5M6.5 4h5M4 11.5A4 4 0 0 0 11.5 6.5" stroke="#0d0d0d" stroke-width="1.5" stroke-linecap="round"/>
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="3.5" cy="3.5" r="2" stroke="#0d0d0d" stroke-width="1.4"/>
+        <circle cx="12.5" cy="3.5" r="2" stroke="#0d0d0d" stroke-width="1.4"/>
+        <circle cx="3.5" cy="12.5" r="2" stroke="#0d0d0d" stroke-width="1.4"/>
+        <path d="M3.5 5.5v5M5.5 3.5h5M3.5 10.5A3.5 3.5 0 0 0 10.5 5.5" stroke="#0d0d0d" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
     </div>
     <div>
-      <div class="logo-text">Git Cheatsheet</div>
-      <div class="logo-sub">rupakkr / searchable reference</div>
+      <div class="logo-name">Git Cheatsheet</div>
+      <div class="logo-sub">rupakkr · every command, copy-ready</div>
     </div>
   </div>
-  <div class="header-right">30 commands &nbsp;·&nbsp; <span>copy-ready snippets</span></div>
+  <div class="hdr-stats" id="hdr-stats">loading...</div>
 </header>
-
 <main>
-  <div class="search-wrap">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/>
-    </svg>
-    <input id="sb" type="text" placeholder="search commands, flags, descriptions...">
+  <div class="search-row">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+    <input id="sb" type="text" placeholder="search commands, descriptions, snippets...">
   </div>
-
   <div class="pills" id="pills"></div>
-  <div class="meta" id="meta"></div>
-  <div class="list" id="list"></div>
+  <div class="meta">
+    <div id="meta-count"></div>
+    <div class="meta-hint">each copy button copies exactly one command</div>
+  </div>
+  <div class="grid" id="grid"></div>
 </main>
-
 <footer>
-  hosted on <a href="https://pages.github.com" target="_blank">github pages</a> &nbsp;·&nbsp;
-  <a href="https://github.com/rupakkr/git-cheatsheet" target="_blank">view source</a>
+  source: <a href="https://git-scm.com/docs" target="_blank">git-scm.com/docs</a> &nbsp;·&nbsp;
+  <a href="https://github.com/rupakkr/git-cheatsheet" target="_blank">github.com/rupakkr/git-cheatsheet</a>
 </footer>
-
 <script>
 const data=[
-  {title:"git init",cat:"basic",desc:"Initialize a new local repository in the current directory.",code:"git init\ngit init --bare   # no working tree (server repo)"},
-  {title:"git clone",cat:"basic",desc:"Copy a remote repository locally. Supports shallow and single-branch clones.",code:"git clone https://github.com/user/repo.git\ngit clone --depth 1 <url>     # latest commit only\ngit clone --branch dev <url>  # clone specific branch"},
-  {title:"git add",cat:"basic",desc:"Stage changes for the next commit.",code:"git add .              # stage everything\ngit add src/file.js    # stage one file\ngit add -p             # interactively pick chunks"},
-  {title:"git commit",cat:"basic",desc:"Save staged changes as a snapshot with a message.",code:'git commit -m "feat: add login"\ngit commit --amend          # edit last commit\ngit commit -a -m "msg"      # auto-stage tracked files'},
-  {title:"git status",cat:"basic",desc:"Show staged, unstaged, and untracked files in the working tree.",code:"git status\ngit status -s    # compact view"},
-  {title:"git branch",cat:"branch",desc:"List, create, rename, or delete branches.",code:"git branch                 # list local branches\ngit branch -a              # list all incl. remote\ngit branch feature/auth    # create branch\ngit branch -d old-branch   # delete (safe)\ngit branch -D old-branch   # delete (force)"},
-  {title:"git switch",cat:"branch",desc:"Switch branches — modern replacement for checkout.",code:"git switch main\ngit switch -c new-feature  # create + switch"},
-  {title:"git checkout",cat:"branch",desc:"Switch branches or restore files (classic command).",code:"git checkout main\ngit checkout -b feature    # create + switch\ngit checkout -- file.js    # discard file changes"},
-  {title:"git merge",cat:"branch",desc:"Integrate another branch into the current one.",code:"git merge feature/login\ngit merge --no-ff feature  # always make a merge commit\ngit merge --squash feature # squash into one commit\ngit merge --abort          # cancel in-progress merge"},
-  {title:"git rebase",cat:"branch",desc:"Replay commits on top of another base for a cleaner history.",code:"git rebase main\ngit rebase -i HEAD~3   # interactive: squash/edit/reorder\ngit rebase --abort     # cancel"},
-  {title:"git stash",cat:"branch",desc:"Shelve uncommitted work temporarily to restore a clean state.",code:"git stash              # save changes\ngit stash pop          # apply + remove top stash\ngit stash list         # see all stashes\ngit stash apply stash@{1}\ngit stash drop stash@{0}"},
-  {title:"git cherry-pick",cat:"branch",desc:"Apply a specific commit from another branch onto current branch.",code:"git cherry-pick abc1234\ngit cherry-pick -n abc1234   # apply without committing"},
-  {title:"git fetch",cat:"remote",desc:"Download remote changes without merging into your branch.",code:"git fetch origin\ngit fetch --all        # all remotes\ngit fetch --prune      # remove stale remote refs"},
-  {title:"git pull",cat:"remote",desc:"Fetch and merge (or rebase) remote changes into the current branch.",code:"git pull origin main\ngit pull --rebase      # rebase instead of merge\ngit pull --ff-only     # only fast-forward"},
-  {title:"git push",cat:"remote",desc:"Upload local commits to a remote repository.",code:"git push origin main\ngit push -u origin main          # set upstream\ngit push --force-with-lease      # safe force push\ngit push origin --delete branch  # delete remote branch\ngit push --tags                  # push all tags"},
-  {title:"git remote",cat:"remote",desc:"Manage remote repository connections.",code:"git remote -v\ngit remote add origin <url>\ngit remote remove origin\ngit remote rename origin upstream"},
-  {title:"git reset",cat:"undo",desc:"Move HEAD to undo commits. Controls whether changes are kept or discarded.",code:"git reset --soft HEAD~1   # undo commit, keep staged\ngit reset HEAD~1           # undo commit, unstage changes\ngit reset --hard HEAD~1   # undo commit, discard changes"},
-  {title:"git revert",cat:"undo",desc:"Create a new commit that undoes a previous one. Safe for shared branches.",code:"git revert abc1234\ngit revert -n abc1234   # stage revert without committing"},
-  {title:"git restore",cat:"undo",desc:"Discard working tree changes or unstage files.",code:"git restore file.js              # discard changes\ngit restore --staged file.js     # unstage file\ngit restore --source HEAD~1 file.js"},
-  {title:"git log",cat:"inspect",desc:"Browse commit history with flexible formatting options.",code:"git log\ngit log --oneline --graph --all\ngit log -n 10              # last 10 commits\ngit log --author='name'\ngit log -- path/to/file"},
-  {title:"git diff",cat:"inspect",desc:"Show what changed between commits, branches, or working state.",code:"git diff                   # unstaged changes\ngit diff --staged          # staged vs last commit\ngit diff main feature      # between branches\ngit diff HEAD~1 HEAD       # last two commits"},
-  {title:"git show",cat:"inspect",desc:"Show details of a commit, tag, or file at a specific revision.",code:"git show abc1234\ngit show HEAD:src/app.js   # file at a commit\ngit show --stat abc1234"},
-  {title:"git tag",cat:"inspect",desc:"Mark release points with a name. Annotated tags include a message.",code:"git tag v1.0.0\ngit tag -a v1.0.0 -m 'Release'\ngit tag -l                 # list all tags\ngit push origin --tags"},
-  {title:"git blame",cat:"debug",desc:"Show who last modified each line of a file and when.",code:"git blame src/app.js\ngit blame -L 10,25 file.js   # specific lines only\ngit blame -w file.js         # ignore whitespace"},
-  {title:"git bisect",cat:"debug",desc:"Binary search commits to find which one introduced a bug.",code:"git bisect start\ngit bisect bad             # current commit is broken\ngit bisect good v1.0.0     # known good point\ngit bisect reset           # end session"},
-  {title:"git grep",cat:"debug",desc:"Search for a pattern across all tracked files in the repo.",code:'git grep "TODO"\ngit grep -n "function"     # with line numbers\ngit grep -i "error"        # case-insensitive'},
-  {title:"git reflog",cat:"admin",desc:"View history of all HEAD movements — your safety net for recovering lost commits.",code:"git reflog\ngit reset --hard HEAD@{2}  # restore to an earlier state"},
-  {title:"git clean",cat:"admin",desc:"Remove untracked files and directories from the working tree.",code:"git clean -n      # dry run (preview first)\ngit clean -fd     # force delete files + dirs\ngit clean -fdx    # also remove ignored files"},
-  {title:"git config",cat:"admin",desc:"Read or set Git configuration at repo, user, or system level.",code:'git config --global user.name "Your Name"\ngit config --global user.email "you@mail.com"\ngit config --list\ngit config --global core.editor "code --wait"'},
-  {title:"git submodule",cat:"admin",desc:"Manage external repos embedded inside your repository.",code:"git submodule add <url> path/\ngit submodule update --init --recursive\ngit submodule foreach git pull"},
+  {title:"git config",cat:"setup",desc:"Get and set repository or global options.",snippets:["git config --global user.name \"Your Name\"","git config --global user.email \"you@example.com\"","git config --global core.editor \"code --wait\"","git config --list","git config --local user.name \"Work Name\"","git config --global alias.st status"]},
+  {title:"git help",cat:"setup",desc:"Display help information about Git commands.",snippets:["git help commit","git help -a","git commit --help"]},
+  {title:"git bugreport",cat:"setup",desc:"Collect system info to file a Git bug report.",snippets:["git bugreport"]},
+  {title:"git init",cat:"setup",desc:"Create an empty repository or reinitialize an existing one.",snippets:["git init","git init --bare","git init --initial-branch=main","git init my-project"]},
+  {title:"git clone",cat:"setup",desc:"Clone a repository into a new directory.",snippets:["git clone https://github.com/user/repo.git","git clone --depth 1 <url>","git clone --branch dev <url>","git clone --single-branch <url>","git clone --recurse-submodules <url>"]},
+  {title:"git add",cat:"snapshot",desc:"Add file contents to the index (stage changes).",snippets:["git add .","git add src/file.js","git add -p","git add -A","git add -u","git add *.js"]},
+  {title:"git status",cat:"snapshot",desc:"Show working tree status — staged, unstaged, and untracked files.",snippets:["git status","git status -s","git status -b","git status --porcelain"]},
+  {title:"git diff",cat:"snapshot",desc:"Show changes between commits, working tree, or index.",snippets:["git diff","git diff --staged","git diff HEAD~1 HEAD","git diff main feature","git diff --stat","git diff --name-only","git diff --word-diff"]},
+  {title:"git commit",cat:"snapshot",desc:"Record changes to the repository as a snapshot.",snippets:["git commit -m \"feat: add login\"","git commit --amend","git commit --amend --no-edit","git commit -a -m \"msg\"","git commit --no-verify","git commit --allow-empty -m \"empty\""]},
+  {title:"git notes",cat:"snapshot",desc:"Add or inspect object notes without altering commits.",snippets:["git notes add -m \"note text\" HEAD","git notes show HEAD","git notes list","git notes remove HEAD","git push origin refs/notes/*"]},
+  {title:"git restore",cat:"snapshot",desc:"Restore working tree files or unstage staged changes.",snippets:["git restore file.js","git restore --staged file.js","git restore --source HEAD~1 file.js","git restore .","git restore --staged ."]},
+  {title:"git reset",cat:"snapshot",desc:"Reset HEAD or index to a known state.",snippets:["git reset --soft HEAD~1","git reset HEAD~1","git reset --hard HEAD~1","git reset HEAD file.js","git reset --hard origin/main"]},
+  {title:"git rm",cat:"snapshot",desc:"Remove files from the working tree and from the index.",snippets:["git rm file.js","git rm --cached file.js","git rm -r dist/","git rm -f file.js"]},
+  {title:"git mv",cat:"snapshot",desc:"Move or rename a file, directory, or symlink.",snippets:["git mv old.js new.js","git mv src/file.js lib/file.js"]},
+  {title:"git branch",cat:"branch",desc:"List, create, or delete branches.",snippets:["git branch","git branch -a","git branch feature/auth","git branch -d old-branch","git branch -D old-branch","git branch -m new-name","git branch -r","git branch --merged main"]},
+  {title:"git checkout",cat:"branch",desc:"Switch branches or restore working tree files.",snippets:["git checkout main","git checkout -b feature/login","git checkout -- file.js","git checkout HEAD~2 -- file.js","git checkout -"]},
+  {title:"git switch",cat:"branch",desc:"Switch branches — modern replacement for checkout.",snippets:["git switch main","git switch -c new-feature","git switch --detach HEAD~3","git switch -"]},
+  {title:"git merge",cat:"branch",desc:"Join two or more development histories together.",snippets:["git merge feature/login","git merge --no-ff feature","git merge --squash feature","git merge --abort","git merge --continue","git merge -X theirs feature"]},
+  {title:"git mergetool",cat:"branch",desc:"Run merge conflict resolution tools interactively.",snippets:["git mergetool","git mergetool --tool=vimdiff","git mergetool --tool=code"]},
+  {title:"git log",cat:"branch",desc:"Show commit logs with flexible formatting.",snippets:["git log","git log --oneline --graph --all","git log -n 10","git log --author=\"name\"","git log -- path/to/file","git log --since=\"2 weeks ago\"","git log --format=\"%h %an %s\"","git log --diff-filter=D -- deleted.js"]},
+  {title:"git stash",cat:"branch",desc:"Stash dirty working directory changes temporarily.",snippets:["git stash","git stash pop","git stash list","git stash apply stash@{1}","git stash drop stash@{0}","git stash branch new-branch stash@{0}","git stash clear","git stash show -p"]},
+  {title:"git tag",cat:"branch",desc:"Create, list, delete or verify tag objects.",snippets:["git tag v1.0.0","git tag -a v1.0.0 -m \"Release v1.0.0\"","git tag -l","git tag -d v1.0.0","git push origin v1.0.0","git push origin --tags","git tag -l \"v1.*\""]},
+  {title:"git worktree",cat:"branch",desc:"Manage multiple working trees from one repository.",snippets:["git worktree add ../hotfix hotfix-branch","git worktree list","git worktree remove ../hotfix","git worktree prune","git worktree add -b emergency-fix ../fix main"]},
+  {title:"git fetch",cat:"remote",desc:"Download objects and refs from another repository.",snippets:["git fetch origin","git fetch --all","git fetch --prune","git fetch --tags","git fetch origin main","git fetch --depth=1 origin main"]},
+  {title:"git pull",cat:"remote",desc:"Fetch from and integrate with another repository.",snippets:["git pull origin main","git pull --rebase","git pull --ff-only","git pull --no-commit","git pull --autostash"]},
+  {title:"git push",cat:"remote",desc:"Update remote refs along with associated objects.",snippets:["git push origin main","git push -u origin main","git push --force-with-lease","git push --force","git push origin --delete branch","git push --tags","git push --dry-run","git push origin HEAD"]},
+  {title:"git remote",cat:"remote",desc:"Manage set of tracked repositories.",snippets:["git remote -v","git remote add origin <url>","git remote remove origin","git remote rename origin upstream","git remote set-url origin <new-url>","git remote show origin","git remote prune origin"]},
+  {title:"git submodule",cat:"remote",desc:"Initialize, update or inspect submodules.",snippets:["git submodule add <url> path/","git submodule update --init --recursive","git submodule foreach git pull","git submodule status","git submodule deinit path/","git submodule sync"]},
+  {title:"git show",cat:"inspect",desc:"Show various types of objects — commits, tags, trees, blobs.",snippets:["git show abc1234","git show HEAD:src/app.js","git show --stat abc1234","git show --name-only HEAD","git show v1.0.0"]},
+  {title:"git difftool",cat:"inspect",desc:"Show changes using external diff tools.",snippets:["git difftool","git difftool --tool=code","git difftool HEAD~1 HEAD","git difftool -y HEAD~1 HEAD"]},
+  {title:"git range-diff",cat:"inspect",desc:"Compare two commit ranges, e.g. two versions of a branch.",snippets:["git range-diff main~3..main origin/main~3..origin/main","git range-diff A B C D"]},
+  {title:"git shortlog",cat:"inspect",desc:"Summarize git log output grouped by author.",snippets:["git shortlog","git shortlog -sn","git shortlog -sn --all","git shortlog -e HEAD"]},
+  {title:"git describe",cat:"inspect",desc:"Give an object a human readable name based on available refs.",snippets:["git describe","git describe --tags","git describe --abbrev=0","git describe HEAD","git describe --always"]},
+  {title:"git apply",cat:"patch",desc:"Apply a patch to files and/or to the index.",snippets:["git apply fix.patch","git apply --check fix.patch","git apply --stat fix.patch","git apply --index fix.patch","git apply --reverse fix.patch"]},
+  {title:"git cherry-pick",cat:"patch",desc:"Apply the changes introduced by existing commits.",snippets:["git cherry-pick abc1234","git cherry-pick -n abc1234","git cherry-pick abc1234..def5678","git cherry-pick --abort","git cherry-pick --continue","git cherry-pick -x abc1234"]},
+  {title:"git rebase",cat:"patch",desc:"Reapply commits on top of another base tip.",snippets:["git rebase main","git rebase -i HEAD~3","git rebase --onto main feature~3 feature","git rebase --abort","git rebase --continue","git rebase --skip","git rebase --autosquash -i main"]},
+  {title:"git revert",cat:"patch",desc:"Revert some existing commits by creating new inverse commits.",snippets:["git revert abc1234","git revert -n abc1234","git revert HEAD~3..HEAD","git revert --no-commit abc1234","git revert --abort"]},
+  {title:"git bisect",cat:"debug",desc:"Use binary search to find the commit that introduced a bug.",snippets:["git bisect start","git bisect bad","git bisect good v1.0.0","git bisect reset","git bisect run npm test","git bisect log","git bisect skip"]},
+  {title:"git blame",cat:"debug",desc:"Show what revision and author last modified each line of a file.",snippets:["git blame src/app.js","git blame -L 10,25 file.js","git blame -w file.js","git blame --date=short file.js","git blame -C file.js"]},
+  {title:"git grep",cat:"debug",desc:"Print lines matching a pattern across tracked files.",snippets:["git grep \"TODO\"","git grep -n \"function\"","git grep -i \"error\"","git grep --count \"import\"","git grep -l \"deprecated\"","git grep -e \"pattern1\" --and -e \"pattern2\""]},
+  {title:"git am",cat:"email",desc:"Apply a series of patches from a mailbox.",snippets:["git am patches/*.patch","git am --abort","git am --continue","git am --skip","git am --signoff patches/*.patch"]},
+  {title:"git format-patch",cat:"email",desc:"Prepare patches for e-mail submission.",snippets:["git format-patch main","git format-patch -1 HEAD","git format-patch HEAD~3","git format-patch --stdout HEAD~1 > fix.patch","git format-patch --cover-letter main"]},
+  {title:"git send-email",cat:"email",desc:"Send a collection of patches as emails.",snippets:["git send-email --to=dev@list.org *.patch","git send-email --dry-run *.patch","git send-email --annotate *.patch"]},
+  {title:"git request-pull",cat:"email",desc:"Generate a summary of pending changes for a pull request.",snippets:["git request-pull v1.0 https://github.com/user/repo main"]},
+  {title:"git imap-send",cat:"email",desc:"Send patches from stdin to an IMAP folder.",snippets:["git format-patch --stdout origin/main | git imap-send"]},
+  {title:"git clean",cat:"admin",desc:"Remove untracked files from the working tree.",snippets:["git clean -n","git clean -fd","git clean -fdx","git clean -fX","git clean -fdi"]},
+  {title:"git gc",cat:"admin",desc:"Cleanup unnecessary files and optimize the local repository.",snippets:["git gc","git gc --aggressive","git gc --prune=now","git gc --auto"]},
+  {title:"git fsck",cat:"admin",desc:"Verify the connectivity and validity of objects in the database.",snippets:["git fsck","git fsck --full","git fsck --unreachable","git fsck --lost-found"]},
+  {title:"git reflog",cat:"admin",desc:"Manage reflog information — your safety net for recovering lost commits.",snippets:["git reflog","git reset --hard HEAD@{2}","git reflog show main","git reflog expire --expire=now --all","git reflog delete HEAD@{1}"]},
+  {title:"git filter-branch",cat:"admin",desc:"Rewrite branches (legacy — prefer git-filter-repo for new work).",snippets:["git filter-branch --tree-filter 'rm -f secrets.txt' HEAD","git filter-branch --env-filter 'GIT_AUTHOR_EMAIL=new@email.com' -- --all","git filter-branch --subdirectory-filter src HEAD"]},
+  {title:"git instaweb",cat:"admin",desc:"Instantly browse your working repository in gitweb.",snippets:["git instaweb","git instaweb --httpd=webrick","git instaweb --stop"]},
+  {title:"git archive",cat:"admin",desc:"Create an archive of files from a named tree.",snippets:["git archive --format=zip HEAD > release.zip","git archive --format=tar.gz HEAD > release.tar.gz","git archive --prefix=myrepo/ HEAD | gzip > release.tar.gz","git archive --remote=origin HEAD | tar xf -"]},
+  {title:"git bundle",cat:"admin",desc:"Move objects and refs by archive (for offline transfer).",snippets:["git bundle create repo.bundle --all","git bundle verify repo.bundle","git clone repo.bundle","git bundle unbundle repo.bundle"]},
+  {title:"git maintenance",cat:"admin",desc:"Run tasks to optimize Git repository data.",snippets:["git maintenance start","git maintenance stop","git maintenance run --task=gc","git maintenance run --task=prefetch","git maintenance run --task=commit-graph"]},
+  {title:"git sparse-checkout",cat:"admin",desc:"Reduce your working tree to a subset of tracked files.",snippets:["git sparse-checkout init --cone","git sparse-checkout set src/ docs/","git sparse-checkout list","git sparse-checkout disable","git sparse-checkout add tests/"]},
+  {title:"git daemon",cat:"server",desc:"A simple server for Git repositories over the git:// protocol.",snippets:["git daemon --reuseaddr --base-path=/srv/git /srv/git","git daemon --export-all --base-path=/srv/git","git daemon --verbose --export-all ."]},
+  {title:"git update-server-info",cat:"server",desc:"Update auxiliary info file to help dumb HTTP servers.",snippets:["git update-server-info"]},
+  {title:"git cat-file",cat:"plumbing",desc:"Provide contents or details of repository objects.",snippets:["git cat-file -t HEAD","git cat-file -p HEAD","git cat-file blob HEAD:file.js","git cat-file -s abc1234","git cat-file --batch-all-objects --batch-check"]},
+  {title:"git check-ignore",cat:"plumbing",desc:"Debug gitignore / exclude files.",snippets:["git check-ignore -v file.log","git check-ignore -v --no-index *","git check-ignore -v dist/"]},
+  {title:"git checkout-index",cat:"plumbing",desc:"Copy files from the index to the working tree.",snippets:["git checkout-index -a","git checkout-index -f file.js","git checkout-index --all --force"]},
+  {title:"git commit-tree",cat:"plumbing",desc:"Create a new commit object directly.",snippets:["git commit-tree <tree> -m \"msg\"","git commit-tree <tree> -p <parent> -m \"msg\""]},
+  {title:"git hash-object",cat:"plumbing",desc:"Compute object ID and optionally create an object from a file.",snippets:["git hash-object file.js","git hash-object -w file.js","echo 'hello' | git hash-object --stdin"]},
+  {title:"git ls-files",cat:"plumbing",desc:"Show information about files in the index and working tree.",snippets:["git ls-files","git ls-files --others --exclude-standard","git ls-files --deleted","git ls-files --modified","git ls-files --cached"]},
+  {title:"git ls-tree",cat:"plumbing",desc:"List the contents of a tree object.",snippets:["git ls-tree HEAD","git ls-tree -r HEAD","git ls-tree --name-only HEAD","git ls-tree HEAD src/"]},
+  {title:"git merge-base",cat:"plumbing",desc:"Find as good common ancestors as possible for a merge.",snippets:["git merge-base main feature","git merge-base --is-ancestor main feature","git merge-base --all A B"]},
+  {title:"git read-tree",cat:"plumbing",desc:"Reads tree information into the index.",snippets:["git read-tree HEAD","git read-tree -m HEAD","git read-tree --prefix=subdir/ HEAD"]},
+  {title:"git rev-list",cat:"plumbing",desc:"List commit objects in reverse chronological order.",snippets:["git rev-list HEAD","git rev-list --count HEAD","git rev-list --oneline HEAD~5..HEAD","git rev-list --ancestry-path A..B"]},
+  {title:"git rev-parse",cat:"plumbing",desc:"Pick out and massage parameters / resolve refs.",snippets:["git rev-parse HEAD","git rev-parse --abbrev-ref HEAD","git rev-parse --show-toplevel","git rev-parse main","git rev-parse --git-dir"]},
+  {title:"git show-ref",cat:"plumbing",desc:"List references in a local repository.",snippets:["git show-ref","git show-ref --heads","git show-ref --tags","git show-ref | grep main"]},
+  {title:"git symbolic-ref",cat:"plumbing",desc:"Read, modify and delete symbolic refs.",snippets:["git symbolic-ref HEAD","git symbolic-ref HEAD refs/heads/main","git symbolic-ref --delete HEAD"]},
+  {title:"git update-index",cat:"plumbing",desc:"Register file contents in the working tree to the index.",snippets:["git update-index --assume-unchanged file.js","git update-index --no-assume-unchanged file.js","git update-index --skip-worktree file.js","git update-index --no-skip-worktree file.js"]},
+  {title:"git update-ref",cat:"plumbing",desc:"Update the object name stored in a ref safely.",snippets:["git update-ref refs/heads/main abc1234","git update-ref -d refs/heads/old-branch","git update-ref refs/heads/main abc1234 def5678"]},
+  {title:"git for-each-ref",cat:"plumbing",desc:"Output information on each ref.",snippets:["git for-each-ref --sort=-creatordate refs/heads/","git for-each-ref --format='%(refname:short)' refs/heads/","git for-each-ref --sort=-version:refname --format='%(tag)' refs/tags/"]},
+  {title:"git write-tree",cat:"plumbing",desc:"Create a tree object from the current index.",snippets:["git write-tree"]},
+  {title:"git verify-pack",cat:"plumbing",desc:"Validate packed Git archive files.",snippets:["git verify-pack -v .git/objects/pack/*.idx","git verify-pack .git/objects/pack/*.idx"]},
+  {title:"git count-objects",cat:"plumbing",desc:"Count unpacked number of objects and their disk consumption.",snippets:["git count-objects","git count-objects -v","git count-objects -vH"]},
+  {title:"git diff-index",cat:"plumbing",desc:"Compare a tree to the working tree or index.",snippets:["git diff-index HEAD","git diff-index --cached HEAD","git diff-index --quiet HEAD"]},
 ];
 
-const cats=["all","basic","branch","remote","undo","inspect","debug","admin"];
-const labels={all:"all",basic:"basics",branch:"branching",remote:"remote",undo:"undo",inspect:"inspect",debug:"debug",admin:"admin"};
-const bc={basic:"b-basic",branch:"b-branch",remote:"b-remote",undo:"b-undo",inspect:"b-inspect",debug:"b-debug",admin:"b-admin"};
+const cats=["all","setup","snapshot","branch","remote","inspect","patch","debug","email","admin","server","plumbing"];
+const labels={all:"all",setup:"setup",snapshot:"snapshot",branch:"branch",remote:"remote",inspect:"inspect",patch:"patch",debug:"debug",email:"email",admin:"admin",server:"server",plumbing:"plumbing"};
+const bc={setup:"b-setup",snapshot:"b-snapshot",branch:"b-branch",remote:"b-remote",inspect:"b-inspect",patch:"b-patch",debug:"b-debug",email:"b-email",admin:"b-admin",server:"b-server",plumbing:"b-plumbing"};
 
-let cat="all", q="";
-
+let cat="all",q="";
 const pillsEl=document.getElementById("pills");
-const listEl=document.getElementById("list");
-const metaEl=document.getElementById("meta");
+const gridEl=document.getElementById("grid");
+const metaEl=document.getElementById("meta-count");
+const hdrEl=document.getElementById("hdr-stats");
 
 cats.forEach(c=>{
   const b=document.createElement("button");
   b.className="pill"+(c==="all"?" on":"");
   b.textContent=labels[c];
-  b.onclick=()=>{
-    cat=c;
-    document.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));
-    b.classList.add("on");
-    render();
-  };
+  b.onclick=()=>{cat=c;document.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));b.classList.add("on");render();};
   pillsEl.appendChild(b);
 });
-
 document.getElementById("sb").addEventListener("input",e=>{q=e.target.value.toLowerCase();render();});
+
+const COPY_SVG=`<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>`;
+const CHECK_SVG=`<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 9 6 13 14 4"/></svg>`;
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 
 function render(){
   const res=data.filter(d=>{
     const mc=cat==="all"||d.cat===cat;
     if(!q.trim())return mc;
-    return mc&&(d.title.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q)||d.code.toLowerCase().includes(q));
+    return mc&&(d.title.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q)||d.snippets.some(s=>s.toLowerCase().includes(q)));
   });
-  metaEl.innerHTML=`<span>${res.length}</span> snippet${res.length!==1?"s":""}`;
-  if(!res.length){listEl.innerHTML='<div class="empty">// no results found</div>';return;}
-  listEl.innerHTML="";
+  const totalSnippets=data.reduce((a,d)=>a+d.snippets.length,0);
+  hdrEl.innerHTML=`<span>${data.length}</span> commands &nbsp;·&nbsp; <span>${totalSnippets}</span> snippets`;
+  metaEl.innerHTML=`<span>${res.length}</span> command${res.length!==1?"s":""}`;
+  if(!res.length){gridEl.innerHTML='<div class="empty">// no results found</div>';return;}
+  gridEl.innerHTML="";
   res.forEach(d=>{
-    const id="c"+Math.random().toString(36).slice(2);
     const card=document.createElement("div");
     card.className="card";
-    card.innerHTML=`
-      <div class="card-top">
-        <span class="cmd">${d.title}</span>
-        <span class="badge ${bc[d.cat]}">${labels[d.cat]}</span>
-      </div>
-      <div class="desc">${d.desc}</div>
-      <div class="code-wrap">
-        <pre id="${id}">${d.code}</pre>
-        <button class="copy-btn" onclick="cp('${id}',this)">copy</button>
-      </div>`;
-    listEl.appendChild(card);
+    const snips=d.snippets.map(s=>{
+      const uid="s"+Math.random().toString(36).slice(2);
+      return`<div class="snippet"><code class="snippet-code" id="${uid}">${esc(s)}</code><button class="snippet-copy" onclick="cp('${uid}',this)" title="copy this command">${COPY_SVG}</button></div>`;
+    }).join("");
+    card.innerHTML=`<div class="card-head"><span class="cmd">${d.title}</span><span class="badge ${bc[d.cat]}">${labels[d.cat]}</span></div><div class="desc">${d.desc}</div><div class="snippets">${snips}</div>`;
+    gridEl.appendChild(card);
   });
 }
 
 function cp(id,btn){
-  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
-    btn.textContent="copied!";btn.classList.add("ok");
-    setTimeout(()=>{btn.textContent="copy";btn.classList.remove("ok");},1500);
+  const text=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add("ok");btn.innerHTML=CHECK_SVG;
+    setTimeout(()=>{btn.classList.remove("ok");btn.innerHTML=COPY_SVG;},1500);
   });
 }
 
