@@ -1,78 +1,244 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Cheatsheet — rupakkr</title>
+<meta name="description" content="A searchable Git command reference with copy-to-clipboard snippets.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-#sb{width:100%;padding:10px 14px;font-size:15px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);color:var(--color-text-primary);margin-bottom:12px}
-#sb:focus{outline:none;border-color:var(--color-border-primary)}
-.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.pill{padding:4px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:transparent;color:var(--color-text-secondary);cursor:pointer}
-.pill.on{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary);font-weight:500}
-.meta{font-size:12px;color:var(--color-text-secondary);margin-bottom:12px}
-.list{display:flex;flex-direction:column;gap:10px}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
-.card:hover{border-color:var(--color-border-secondary)}
-.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
-.title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.badge{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap}
-.b-basic{background:#E6F1FB;color:#0C447C}
-.b-branch{background:#EEEDFE;color:#3C3489}
-.b-remote{background:#E1F5EE;color:#085041}
-.b-undo{background:#FCEBEB;color:#791F1F}
-.b-inspect{background:#FAEEDA;color:#633806}
-.b-debug{background:#FBEAF0;color:#72243E}
-.b-admin{background:#F1EFE8;color:#444441}
-.desc{font-size:13px;color:var(--color-text-secondary);margin-bottom:10px;line-height:1.5}
-.code-wrap{position:relative}
-.code{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);color:var(--color-text-secondary);padding:8px 40px 8px 10px;border-radius:var(--border-radius-md);white-space:pre;overflow-x:auto;line-height:1.6}
-.copy-btn{position:absolute;top:6px;right:6px;padding:2px 8px;font-size:11px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
-.copy-btn:hover{background:var(--color-background-secondary)}
-.copy-btn.ok{color:var(--color-text-success);border-color:var(--color-border-success)}
-.empty{text-align:center;color:var(--color-text-secondary);padding:2.5rem;font-size:14px}
-</style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<div style="padding:1rem 0">
-<input id="sb" type="text" placeholder="Search commands, descriptions, flags...">
-<div class="pills" id="pills"></div>
-<div class="meta" id="meta"></div>
-<div class="list" id="list"></div>
-</div>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #f0ede8;
+    --muted: #6b6b6b;
+    --accent: #c8f542;
+    --accent-dim: rgba(200,245,66,0.1);
+    --accent-text: #0d0d0d;
+    --font-sans: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-top: 1px; }
+  .header-right { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+  .header-right span { color: var(--accent); }
+
+  /* main layout */
+  main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  /* search */
+  .search-wrap { position: relative; margin-bottom: 20px; }
+  .search-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--muted); pointer-events: none;
+  }
+  #sb {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    font-size: 14px;
+    font-family: var(--font-mono);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  #sb::placeholder { color: var(--muted); }
+  #sb:focus { outline: none; border-color: var(--accent); }
+
+  /* pills */
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .pill {
+    padding: 5px 12px; font-size: 12px; font-family: var(--font-mono);
+    border: 1px solid var(--border); border-radius: 20px;
+    background: transparent; color: var(--muted); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .pill.on { background: var(--accent-dim); color: var(--accent); border-color: rgba(200,245,66,0.3); }
+
+  /* meta */
+  .meta { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 16px; }
+  .meta span { color: var(--accent); }
+
+  /* cards */
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--border-hover); }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .cmd { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--accent); }
+  .badge {
+    font-size: 10px; font-family: var(--font-mono);
+    padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+    border: 1px solid;
+  }
+  .b-basic  { color: #7bb8f5; border-color: rgba(123,184,245,0.25); background: rgba(123,184,245,0.08); }
+  .b-branch { color: #b89cf5; border-color: rgba(184,156,245,0.25); background: rgba(184,156,245,0.08); }
+  .b-remote { color: #6dd9b0; border-color: rgba(109,217,176,0.25); background: rgba(109,217,176,0.08); }
+  .b-undo   { color: #f58888; border-color: rgba(245,136,136,0.25); background: rgba(245,136,136,0.08); }
+  .b-inspect{ color: #f5c76d; border-color: rgba(245,199,109,0.25); background: rgba(245,199,109,0.08); }
+  .b-debug  { color: #f59bb8; border-color: rgba(245,155,184,0.25); background: rgba(245,155,184,0.08); }
+  .b-admin  { color: #a0a09a; border-color: rgba(160,160,154,0.25); background: rgba(160,160,154,0.08); }
+
+  .desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+
+  .code-wrap { position: relative; }
+  pre {
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
+    background: var(--surface2); color: #c9c0b0;
+    padding: 10px 44px 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    white-space: pre; overflow-x: auto;
+  }
+  .copy-btn {
+    position: absolute; top: 7px; right: 8px;
+    padding: 3px 9px; font-size: 10px; font-family: var(--font-mono);
+    border: 1px solid var(--border-hover); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--muted); cursor: pointer;
+    transition: all 0.12s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.ok { color: var(--accent); border-color: rgba(200,245,66,0.4); }
+
+  .empty { text-align: center; color: var(--muted); padding: 3rem; font-family: var(--font-mono); font-size: 13px; }
+
+  /* footer */
+  footer {
+    text-align: center; font-size: 12px; color: var(--muted);
+    font-family: var(--font-mono); padding: 24px;
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    header { padding: 20px 16px; }
+    main { padding: 24px 16px 48px; }
+    .cmd { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="4" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
+        <circle cx="14" cy="4" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
+        <circle cx="4" cy="14" r="2.5" stroke="#0d0d0d" stroke-width="1.5"/>
+        <path d="M4 6.5v5M6.5 4h5M4 11.5A4 4 0 0 0 11.5 6.5" stroke="#0d0d0d" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Git Cheatsheet</div>
+      <div class="logo-sub">rupakkr / searchable reference</div>
+    </div>
+  </div>
+  <div class="header-right">30 commands &nbsp;·&nbsp; <span>copy-ready snippets</span></div>
+</header>
+
+<main>
+  <div class="search-wrap">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/>
+    </svg>
+    <input id="sb" type="text" placeholder="search commands, flags, descriptions...">
+  </div>
+
+  <div class="pills" id="pills"></div>
+  <div class="meta" id="meta"></div>
+  <div class="list" id="list"></div>
+</main>
+
+<footer>
+  hosted on <a href="https://pages.github.com" target="_blank">github pages</a> &nbsp;·&nbsp;
+  <a href="https://github.com/rupakkr/git-cheatsheet" target="_blank">view source</a>
+</footer>
 
 <script>
 const data=[
   {title:"git init",cat:"basic",desc:"Initialize a new local repository in the current directory.",code:"git init\ngit init --bare   # no working tree (server repo)"},
-  {title:"git clone",cat:"basic",desc:"Copy a remote repository locally. Optionally shallow or single-branch.",code:"git clone https://github.com/user/repo.git\ngit clone --depth 1 <url>   # latest commit only\ngit clone --branch dev <url>"},
+  {title:"git clone",cat:"basic",desc:"Copy a remote repository locally. Supports shallow and single-branch clones.",code:"git clone https://github.com/user/repo.git\ngit clone --depth 1 <url>     # latest commit only\ngit clone --branch dev <url>  # clone specific branch"},
   {title:"git add",cat:"basic",desc:"Stage changes for the next commit.",code:"git add .              # stage everything\ngit add src/file.js    # stage one file\ngit add -p             # interactively pick chunks"},
-  {title:"git commit",cat:"basic",desc:"Save staged changes as a snapshot.",code:'git commit -m "feat: add login"\ngit commit --amend     # edit last commit\ngit commit -a -m "msg" # auto-stage tracked files'},
-  {title:"git status",cat:"basic",desc:"Show staged, unstaged, and untracked files.",code:"git status\ngit status -s          # compact view"},
-  {title:"git branch",cat:"branch",desc:"List, create, rename, or delete branches.",code:"git branch                 # list local\ngit branch -a              # list all (+ remote)\ngit branch feature/auth    # create branch\ngit branch -d old-branch   # delete (safe)\ngit branch -D old-branch   # delete (force)"},
-  {title:"git switch",cat:"branch",desc:"Switch branches (modern replacement for checkout).",code:"git switch main\ngit switch -c new-feature  # create + switch"},
+  {title:"git commit",cat:"basic",desc:"Save staged changes as a snapshot with a message.",code:'git commit -m "feat: add login"\ngit commit --amend          # edit last commit\ngit commit -a -m "msg"      # auto-stage tracked files'},
+  {title:"git status",cat:"basic",desc:"Show staged, unstaged, and untracked files in the working tree.",code:"git status\ngit status -s    # compact view"},
+  {title:"git branch",cat:"branch",desc:"List, create, rename, or delete branches.",code:"git branch                 # list local branches\ngit branch -a              # list all incl. remote\ngit branch feature/auth    # create branch\ngit branch -d old-branch   # delete (safe)\ngit branch -D old-branch   # delete (force)"},
+  {title:"git switch",cat:"branch",desc:"Switch branches — modern replacement for checkout.",code:"git switch main\ngit switch -c new-feature  # create + switch"},
   {title:"git checkout",cat:"branch",desc:"Switch branches or restore files (classic command).",code:"git checkout main\ngit checkout -b feature    # create + switch\ngit checkout -- file.js    # discard file changes"},
-  {title:"git merge",cat:"branch",desc:"Merge another branch into the current branch.",code:"git merge feature/login\ngit merge --no-ff feature  # always make merge commit\ngit merge --squash feature # squash into one commit\ngit merge --abort          # cancel in-progress merge"},
+  {title:"git merge",cat:"branch",desc:"Integrate another branch into the current one.",code:"git merge feature/login\ngit merge --no-ff feature  # always make a merge commit\ngit merge --squash feature # squash into one commit\ngit merge --abort          # cancel in-progress merge"},
   {title:"git rebase",cat:"branch",desc:"Replay commits on top of another base for a cleaner history.",code:"git rebase main\ngit rebase -i HEAD~3   # interactive: squash/edit/reorder\ngit rebase --abort     # cancel"},
-  {title:"git stash",cat:"branch",desc:"Shelve uncommitted work temporarily and restore a clean state.",code:"git stash              # save changes\ngit stash pop          # apply + remove top stash\ngit stash list         # see all stashes\ngit stash apply stash@{1}\ngit stash drop stash@{0}"},
-  {title:"git cherry-pick",cat:"branch",desc:"Apply a specific commit from another branch onto current branch.",code:"git cherry-pick abc1234\ngit cherry-pick -n abc1234  # apply without committing"},
+  {title:"git stash",cat:"branch",desc:"Shelve uncommitted work temporarily to restore a clean state.",code:"git stash              # save changes\ngit stash pop          # apply + remove top stash\ngit stash list         # see all stashes\ngit stash apply stash@{1}\ngit stash drop stash@{0}"},
+  {title:"git cherry-pick",cat:"branch",desc:"Apply a specific commit from another branch onto current branch.",code:"git cherry-pick abc1234\ngit cherry-pick -n abc1234   # apply without committing"},
   {title:"git fetch",cat:"remote",desc:"Download remote changes without merging into your branch.",code:"git fetch origin\ngit fetch --all        # all remotes\ngit fetch --prune      # remove stale remote refs"},
-  {title:"git pull",cat:"remote",desc:"Fetch and merge (or rebase) remote changes into current branch.",code:"git pull origin main\ngit pull --rebase      # use rebase instead of merge\ngit pull --ff-only     # only allow fast-forward"},
-  {title:"git push",cat:"remote",desc:"Upload local commits to a remote repository.",code:"git push origin main\ngit push -u origin main        # set upstream\ngit push --force-with-lease    # safe force push\ngit push origin --delete branch # delete remote branch\ngit push --tags                # push all tags"},
+  {title:"git pull",cat:"remote",desc:"Fetch and merge (or rebase) remote changes into the current branch.",code:"git pull origin main\ngit pull --rebase      # rebase instead of merge\ngit pull --ff-only     # only fast-forward"},
+  {title:"git push",cat:"remote",desc:"Upload local commits to a remote repository.",code:"git push origin main\ngit push -u origin main          # set upstream\ngit push --force-with-lease      # safe force push\ngit push origin --delete branch  # delete remote branch\ngit push --tags                  # push all tags"},
   {title:"git remote",cat:"remote",desc:"Manage remote repository connections.",code:"git remote -v\ngit remote add origin <url>\ngit remote remove origin\ngit remote rename origin upstream"},
-  {title:"git reset",cat:"undo",desc:"Move HEAD to undo commits. Controls what happens to changes.",code:"git reset --soft HEAD~1   # undo commit, keep staged\ngit reset HEAD~1           # undo commit, unstage changes\ngit reset --hard HEAD~1   # undo commit, discard changes"},
-  {title:"git revert",cat:"undo",desc:"Create a new commit that undoes a previous one. Safe for shared branches.",code:"git revert abc1234\ngit revert -n abc1234  # apply without committing"},
-  {title:"git restore",cat:"undo",desc:"Discard working tree changes or unstage files.",code:"git restore file.js            # discard changes\ngit restore --staged file.js   # unstage file\ngit restore --source HEAD~1 file.js"},
-  {title:"git log",cat:"inspect",desc:"Browse commit history with various formatting options.",code:"git log\ngit log --oneline --graph --all\ngit log -n 10              # last 10 commits\ngit log --author='name'\ngit log -- path/to/file"},
+  {title:"git reset",cat:"undo",desc:"Move HEAD to undo commits. Controls whether changes are kept or discarded.",code:"git reset --soft HEAD~1   # undo commit, keep staged\ngit reset HEAD~1           # undo commit, unstage changes\ngit reset --hard HEAD~1   # undo commit, discard changes"},
+  {title:"git revert",cat:"undo",desc:"Create a new commit that undoes a previous one. Safe for shared branches.",code:"git revert abc1234\ngit revert -n abc1234   # stage revert without committing"},
+  {title:"git restore",cat:"undo",desc:"Discard working tree changes or unstage files.",code:"git restore file.js              # discard changes\ngit restore --staged file.js     # unstage file\ngit restore --source HEAD~1 file.js"},
+  {title:"git log",cat:"inspect",desc:"Browse commit history with flexible formatting options.",code:"git log\ngit log --oneline --graph --all\ngit log -n 10              # last 10 commits\ngit log --author='name'\ngit log -- path/to/file"},
   {title:"git diff",cat:"inspect",desc:"Show what changed between commits, branches, or working state.",code:"git diff                   # unstaged changes\ngit diff --staged          # staged vs last commit\ngit diff main feature      # between branches\ngit diff HEAD~1 HEAD       # last two commits"},
-  {title:"git show",cat:"inspect",desc:"Show details of a commit, tag, or file at a revision.",code:"git show abc1234\ngit show HEAD:src/app.js   # file at a commit\ngit show --stat abc1234"},
-  {title:"git tag",cat:"inspect",desc:"Mark release points with a name.",code:"git tag v1.0.0\ngit tag -a v1.0.0 -m 'Release'\ngit tag -l                 # list all tags\ngit push origin --tags"},
-  {title:"git blame",cat:"debug",desc:"Show who last modified each line of a file.",code:"git blame src/app.js\ngit blame -L 10,25 file.js   # specific lines\ngit blame -w file.js         # ignore whitespace"},
-  {title:"git bisect",cat:"debug",desc:"Binary search commits to find which introduced a bug.",code:"git bisect start\ngit bisect bad             # current is broken\ngit bisect good v1.0.0     # known good point\ngit bisect reset           # end session"},
-  {title:"git grep",cat:"debug",desc:"Search for a pattern across all tracked files.",code:'git grep "TODO"\ngit grep -n "function"     # with line numbers\ngit grep -i "error"        # case-insensitive'},
-  {title:"git reflog",cat:"admin",desc:"View history of all HEAD movements. Recover lost commits.",code:"git reflog\ngit reset --hard HEAD@{2}  # restore to earlier state"},
-  {title:"git clean",cat:"admin",desc:"Remove untracked files and directories.",code:"git clean -n      # dry run (preview)\ngit clean -fd     # force delete files + dirs\ngit clean -fdx    # also remove ignored files"},
+  {title:"git show",cat:"inspect",desc:"Show details of a commit, tag, or file at a specific revision.",code:"git show abc1234\ngit show HEAD:src/app.js   # file at a commit\ngit show --stat abc1234"},
+  {title:"git tag",cat:"inspect",desc:"Mark release points with a name. Annotated tags include a message.",code:"git tag v1.0.0\ngit tag -a v1.0.0 -m 'Release'\ngit tag -l                 # list all tags\ngit push origin --tags"},
+  {title:"git blame",cat:"debug",desc:"Show who last modified each line of a file and when.",code:"git blame src/app.js\ngit blame -L 10,25 file.js   # specific lines only\ngit blame -w file.js         # ignore whitespace"},
+  {title:"git bisect",cat:"debug",desc:"Binary search commits to find which one introduced a bug.",code:"git bisect start\ngit bisect bad             # current commit is broken\ngit bisect good v1.0.0     # known good point\ngit bisect reset           # end session"},
+  {title:"git grep",cat:"debug",desc:"Search for a pattern across all tracked files in the repo.",code:'git grep "TODO"\ngit grep -n "function"     # with line numbers\ngit grep -i "error"        # case-insensitive'},
+  {title:"git reflog",cat:"admin",desc:"View history of all HEAD movements — your safety net for recovering lost commits.",code:"git reflog\ngit reset --hard HEAD@{2}  # restore to an earlier state"},
+  {title:"git clean",cat:"admin",desc:"Remove untracked files and directories from the working tree.",code:"git clean -n      # dry run (preview first)\ngit clean -fd     # force delete files + dirs\ngit clean -fdx    # also remove ignored files"},
   {title:"git config",cat:"admin",desc:"Read or set Git configuration at repo, user, or system level.",code:'git config --global user.name "Your Name"\ngit config --global user.email "you@mail.com"\ngit config --list\ngit config --global core.editor "code --wait"'},
   {title:"git submodule",cat:"admin",desc:"Manage external repos embedded inside your repository.",code:"git submodule add <url> path/\ngit submodule update --init --recursive\ngit submodule foreach git pull"},
 ];
 
 const cats=["all","basic","branch","remote","undo","inspect","debug","admin"];
-const labels={all:"All",basic:"Basics",branch:"Branching",remote:"Remote",undo:"Undo",inspect:"Inspect",debug:"Debug",admin:"Admin"};
+const labels={all:"all",basic:"basics",branch:"branching",remote:"remote",undo:"undo",inspect:"inspect",debug:"debug",admin:"admin"};
 const bc={basic:"b-basic",branch:"b-branch",remote:"b-remote",undo:"b-undo",inspect:"b-inspect",debug:"b-debug",admin:"b-admin"};
 
 let cat="all", q="";
@@ -102,37 +268,35 @@ function render(){
     if(!q.trim())return mc;
     return mc&&(d.title.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q)||d.code.toLowerCase().includes(q));
   });
-  metaEl.textContent=res.length+" snippet"+(res.length!==1?"s":"");
-  if(!res.length){listEl.innerHTML='<div class="empty">No snippets match your search.</div>';return;}
+  metaEl.innerHTML=`<span>${res.length}</span> snippet${res.length!==1?"s":""}`;
+  if(!res.length){listEl.innerHTML='<div class="empty">// no results found</div>';return;}
   listEl.innerHTML="";
   res.forEach(d=>{
+    const id="c"+Math.random().toString(36).slice(2);
     const card=document.createElement("div");
     card.className="card";
-    const codeId="c"+Math.random().toString(36).slice(2);
     card.innerHTML=`
-      <div class="top">
-        <span class="title">${d.title}</span>
-        <div class="right">
-          <span class="badge ${bc[d.cat]}">${labels[d.cat]}</span>
-        </div>
+      <div class="card-top">
+        <span class="cmd">${d.title}</span>
+        <span class="badge ${bc[d.cat]}">${labels[d.cat]}</span>
       </div>
       <div class="desc">${d.desc}</div>
       <div class="code-wrap">
-        <pre class="code" id="${codeId}">${d.code}</pre>
-        <button class="copy-btn" onclick="copyCode('${codeId}',this)">copy</button>
+        <pre id="${id}">${d.code}</pre>
+        <button class="copy-btn" onclick="cp('${id}',this)">copy</button>
       </div>`;
     listEl.appendChild(card);
   });
 }
 
-function copyCode(id,btn){
-  const text=document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(()=>{
-    btn.textContent="copied";
-    btn.classList.add("ok");
+function cp(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent="copied!";btn.classList.add("ok");
     setTimeout(()=>{btn.textContent="copy";btn.classList.remove("ok");},1500);
   });
 }
 
 render();
 </script>
+</body>
+</html>
